@@ -36,16 +36,21 @@ class MyService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private lateinit var notificationManager: NotificationManager
-
-    private val mBinder = MyBinder()
+    private lateinit var mBinder: IBinder
 
     // Random number generator
-    private val mGenerator: Random = Random()
+    private lateinit var mGenerator: Random
 
     private val _numberGenerated = MutableSharedFlow<Int>(replay = 1)
     val numberGenerated = _numberGenerated.asSharedFlow()
 
     private var isActive = false
+
+    override fun onCreate() {
+        super.onCreate()
+        mGenerator = Random()
+        mBinder = MyBinder()
+    }
 
     companion object {
         val TAG = "MyService"
@@ -146,6 +151,10 @@ class MyService : Service() {
         getRandomNumber()
     }
 
+
+    /**
+    *     android:launchMode="singleTask" in manifest to not allow multiple mainActivities
+    * */
     private fun getMainActivityPendingIntent(): PendingIntent = PendingIntent.getActivity(
         this,
         0,
